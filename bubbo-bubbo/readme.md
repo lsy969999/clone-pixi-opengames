@@ -1,0 +1,1 @@
+npm install --save-dev @assetpack/plugin-compress @assetpack/plugin-ffmpeg @assetpack/plugin-json @assetpack/plugin-manifest @assetpack/plugin-mipmap @assetpack/plugin-texture-packer @assetpack/plugin-webfont @typescript-eslint/eslint-plugin @typescript-eslint/parser
