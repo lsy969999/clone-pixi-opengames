@@ -1,5 +1,8 @@
 import { Application } from "pixi.js";
 import { designConfig } from "./game/designConfig";
+import { navigation } from "./navigation";
+import { initAssets } from "./assets";
+import { storage } from "./storage";
 
 /** 프로젝트에서 전역적으로 공유되는 픽시 인스턴스 */
 export const app = new Application<HTMLCanvasElement>({
@@ -30,4 +33,23 @@ function resize() {
 
   //렌더러 및 네비게이션 화면의 크기를 업데이트
   app.renderer.resize(width, height)
+  navigation.init();
+  navigation.resize(width, height);
+}
+
+/** 앱을 세팅하고 자산을 초기화 합니다. */
+async function init() {
+  //픽시캔버스를 바디에 추가합니다.
+  document.body.appendChild(app.view);
+
+  window.addEventListener('resize', resize)
+
+  resize();
+
+  await initAssets();
+
+  storage.readyStorage();
+
+  
+
 }
