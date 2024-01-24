@@ -1,5 +1,6 @@
-import { Container } from "pixi.js";
+import { Assets, Container } from "pixi.js";
 import { app } from "./main";
+import { areBundlesLoaded } from "./assets";
 
 /** 앱 스크린 인터페이스 */
 export interface AppScreen<T = any> extends Container {
@@ -61,8 +62,34 @@ class Navigation {
     this.loadScreen = this._getScreen(Ctor);
   }
 
+  /**
+   * 현재 화면 위에 오버레이 화면을 표시합니다.
+   * @param Ctor 오버레이 화면의 생성자입니다.
+   * @param data 오버레이로 전송될 데이터입니다.
+   */
   public async showOverlay<T>(Ctor: AppScreenConstructor, data?: T) {
-    
+    //넘어온 screen을 overlay로 지정하고 currentScreen을 대체하지않고 위에 overlay screen을 표시합니다.
+    this._showScreen(Ctor, true, data);
+  }
+
+  /**
+   * 현재화면을 숨기고, 새화면을 표시합니다.
+   * AppScreen 인터페이스와 일치하는 모든 클래스를 여기서 사용할수 있습니다.
+   * @param Ctor 화면의 생성자입니다.
+   * @param data 화면에 전송될 데이터입니다.
+   */
+  public async goToScreen<T>(Ctor: AppScreenConstructor, data?: T) {
+    //넘어온 스크린을 overlay로 지정하지 않고, currentScreen을 대체합니다.
+    this._showScreen(Ctor, false, data);
+  }
+
+  /**
+   * 현재 오버레이가 활성화 되어 있으면 숨깁니다.
+   */
+  public async hideOverlay() {
+    if (!this.currentOverlay) return;
+
+    this._removeScreen(this.currentOverlay, true)
   }
 
   /**
@@ -83,15 +110,47 @@ class Navigation {
     return screen;
   }
 
-
+  /**
+   * 현재 화면을 숨기고(있는 경우) 번들을 로드하고 새 화면을 표시합니다
+   * @param Ctor 추가되는 화면 인스턴스입니다
+   * @param isOverlay 화면이 오버레이인지 확인하는 플래그입니다.
+   * @param data 화면에 전송할 데이터입니다.
+   */
   private async _showScreen<T>(Ctor: AppScreenConstructor, isOverlay: boolean, data: T) {
     const current = isOverlay ? this.currentOverlay : this.currentScreen;
+
+    //이미 생성된 화면이 있으면 숨깁니다.
     if (current) {
       await this._removeScreen(current);
     }
 
-  }
+    //가능한 경우 새 화면의 자산 로드
+    if (Ctor.assetBundles && !areBundlesLoaded(Ctor.assetBundles)) {
+      //로드화면 표시
+      if (this.loadScreen) {
+        this._addScreen(this.loadScreen, isOverlay)
+      }
 
+      //이 새 화면에 필요한 모든 자산을 로드합니다.
+      await Assets.loadBundle(Ctor.assetBundles)
+
+      //로드화면 제거
+      if (this.loadScreen) {
+        this._removeScreen(this.loadScreen, isOverlay)
+      }
+    }
+
+    //새로운 화면를 생성하고 스테이지에 추가한다.
+    if (isOverlay) {
+      this.currentOverlay = this._getScreen(Ctor)
+      this.currentOverlay.prepare?.(data);
+      await this._addScreen(this.currentOverlay, isOverlay);
+    } else {
+      this.currentScreen = this._getScreen(Ctor);
+      this.currentScreen.prepare?.(data);
+      await this._addScreen(this.currentScreen, isOverlay);
+    }
+  }
 
   /**
    * 스테이지에서 스크린을 제거 및 관련 티커업데이트, 리사이즈도 해제한다.
@@ -157,4 +216,20 @@ class Navigation {
       await screen.show();
     }
   }
+
+  /**
+   * 화면 크기가 조정될 때마다 호출됩니다.
+   * 화면 너비와 높이를 currentScreen과 currentOverlay 전달합니다.
+   * @param w 화면의 width
+   * @param h 화면의 height
+   */
+  public resize(w: number, h: number) {
+    this._w = w;
+    this._h = h;
+    this.currentScreen?.resize?.(w, h);
+    this.currentOverlay?.resize?.(w, h);
+  }
 }
+
+/** 화면 및 오버레이 탐색을 처리하는 클래스 인스턴스 */
+export const navigation = new Navigation();
