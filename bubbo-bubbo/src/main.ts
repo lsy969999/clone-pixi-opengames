@@ -6,6 +6,7 @@ import { storage } from "./storage";
 import { LoadScreen } from "./screens/LoadScreen";
 import { audio, bgm } from "./audio";
 import { getUrlParams } from "./utils/utils";
+import { TitleScreen } from "./screens/TitleScreen";
 
 /** 프로젝트에서 전역적으로 공유되는 픽시 인스턴스 */
 export const app = new Application<HTMLCanvasElement>({
@@ -77,7 +78,7 @@ async function init() {
   } else if (getUrlParams('loading') != null) {
     await navigation.goToScreen(LoadScreen)
   } else {
-
+    await navigation.goToScreen(TitleScreen)
   }
 
 }
