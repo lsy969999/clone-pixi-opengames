@@ -1,6 +1,7 @@
 import { Container, Sprite } from "pixi.js";
 import { BubbleView } from "./BubbleView";
 import { BubbleType, boardConfig } from "../boardConfig";
+import gsap from "gsap";
 
 export class Cannon {
   public view = new Container();

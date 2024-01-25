@@ -1,8 +1,11 @@
-import { Application } from "pixi.js";
+import { Application, Assets } from "pixi.js";
 import { designConfig } from "./game/designConfig";
 import { navigation } from "./navigation";
 import { initAssets } from "./assets";
 import { storage } from "./storage";
+import { LoadScreen } from "./screens/LoadScreen";
+import { audio, bgm } from "./audio";
+import { getUrlParams } from "./utils/utils";
 
 /** 프로젝트에서 전역적으로 공유되는 픽시 인스턴스 */
 export const app = new Application<HTMLCanvasElement>({
@@ -50,6 +53,33 @@ async function init() {
 
   storage.readyStorage();
 
-  
+  navigation.setLoadScreen(LoadScreen)
+
+  audio.muted(storage.getStorageItem('muted'));
+
+  document.addEventListener('pointerdown', () => {
+    if (!hasInteracted) {
+      bgm.play('audio/bubbo-bubbo-bg-music.wav')
+    }
+    hasInteracted = true
+  })
+
+  document.addEventListener('visibilitychange', ()=>{
+    if(document.visibilityState !== 'visible') {
+      audio.muted(true)
+    } else {
+      audio.muted(storage.getStorageItem('muted'))
+    }
+  })
+
+  if (getUrlParams('play') !== null) {
+    // await Assets.loadBundle(TitleSc)
+  } else if (getUrlParams('loading') != null) {
+    await navigation.goToScreen(LoadScreen)
+  } else {
+
+  }
 
 }
+
+init()
