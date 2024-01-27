@@ -1,5 +1,5 @@
 import { Container, FederatedPointerEvent, Graphics, Rectangle, Texture, TilingSprite } from "pixi.js";
-import { AppScreen } from "../navigation";
+import { AppScreen, navigation } from "../navigation";
 import { Title } from "../ui/Title";
 import { PixiLogo } from "../ui/PixiLogo";
 import { Cannon } from "../game/entities/Cannon";
@@ -13,6 +13,7 @@ import { throttle } from "../utils/throttle";
 import { sfx } from "../audio";
 import { storage } from "../storage";
 import gsap from "gsap";
+import { GameScreen } from "./GameScreen";
 
 export class TitleScreen extends Container implements AppScreen {
   public static SCREEN_ID = 'title';
@@ -222,6 +223,7 @@ export class TitleScreen extends Container implements AppScreen {
 
     this._playBtn.onPress.connect(() => {
       //go to game screen
+      navigation.goToScreen(GameScreen)
     })
 
     this._bottomAnimContainer.addChild(this._playBtn)
