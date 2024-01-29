@@ -30,7 +30,7 @@ export class ScoreCounter {
   }
 
   public async setScore(score: number) {
-    this._scoreText.style.fontSize = 30;
+    this._scoreText.text = score.toLocaleString();
     this._scoreText.style.fontSize = 30;
     while(this._scoreText.width > this._base.width) {
       this._scoreText.style.fontSize--;
