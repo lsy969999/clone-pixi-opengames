@@ -47,7 +47,7 @@ export class GameScreen extends Container implements AppScreen {
     this._game.reset()
   }
 
-  public updte(delta: number) {
+  public update(delta: number) {
     this._game.update(delta)
   }
 

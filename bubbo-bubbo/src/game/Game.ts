@@ -3,6 +3,7 @@ import { SystemRunner } from "./SystemRunner";
 import { Stats } from "./Stats";
 import { PauseSystem } from "./systems/PauseSystem";
 import { boardConfig } from "./boardConfig";
+import { SpaceDecorSystem } from "./systems/SpaceDecorSystem";
 
 export class Game {
   public stage = new Container();
@@ -40,6 +41,7 @@ export class Game {
 
   public init() {
     this.systems.add(PauseSystem)
+    this.systems.add(SpaceDecorSystem)
 
     this.systems.init()
   }
@@ -65,6 +67,7 @@ export class Game {
 
   public update(delta: number) {
     //TODO
+    this.systems.update(delta)
   }
 
   public reset() {
