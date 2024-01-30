@@ -4,6 +4,7 @@ import { Stats } from "./Stats";
 import { PauseSystem } from "./systems/PauseSystem";
 import { boardConfig } from "./boardConfig";
 import { SpaceDecorSystem } from "./systems/SpaceDecorSystem";
+import { HudSystem } from "./systems/HudSystem";
 
 export class Game {
   public stage = new Container();
@@ -42,6 +43,7 @@ export class Game {
   public init() {
     this.systems.add(PauseSystem)
     this.systems.add(SpaceDecorSystem)
+    this.systems.add(HudSystem)
 
     this.systems.init()
   }
